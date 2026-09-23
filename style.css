@@ -1,0 +1,701 @@
+/* ================================================================
+   BIRTHDAY SURPRISE — STYLESHEET
+   ----------------------------------------------------------------
+   Design tokens live at the top under :root. Colors, type and
+   spacing all read from these variables — change the look of the
+   whole site by editing values here.
+   ================================================================ */
+
+:root {
+  /* ---- Color: deep indigo night, warm ember accent ---- */
+  --color-bg-deep:      #0c0a17;
+  --color-bg-mid:       #1a1330;
+  --color-bg-warm:      #2a1a2e;
+  --color-ink:          #f3ecf8;
+  --color-ink-soft:     rgba(243, 236, 248, 0.72);
+  --color-ink-faint:    rgba(243, 236, 248, 0.45);
+  --color-ember:        #e7b26b;
+  --color-ember-soft:   rgba(231, 178, 107, 0.35);
+  --color-rose:         #d98fa0;
+  --color-glass:        rgba(255, 255, 255, 0.055);
+  --color-glass-border: rgba(255, 255, 255, 0.11);
+
+  /* ---- Type ---- */
+  --font-serif: 'Cormorant Garamond', 'Iowan Old Style', Georgia, serif;
+  --font-sans:  'Jost', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+
+  /* ---- Layout ---- */
+  --content-max: 620px;
+  --content-max-wide: 720px;
+  --radius-lg: 22px;
+  --radius-md: 14px;
+  --radius-sm: 9px;
+
+  /* ---- Motion ---- */
+  --ease-cinematic: cubic-bezier(0.22, 1, 0.36, 1);
+  --dur-fast: 320ms;
+  --dur-med: 620ms;
+  --dur-slow: 1100ms;
+}
+
+/* ================================================================
+   RESET & BASE
+   ================================================================ */
+*, *::before, *::after { box-sizing: border-box; }
+
+html {
+  height: 100%;
+  /* mobile viewport-height fix is applied via --vh in script.js */
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  min-height: calc(var(--vh, 1vh) * 100);
+  background: var(--color-bg-deep);
+  color: var(--color-ink);
+  font-family: var(--font-sans);
+  font-weight: 300;
+  -webkit-font-smoothing: antialiased;
+  overflow-x: hidden;
+}
+
+img { max-width: 100%; display: block; }
+
+button {
+  font-family: inherit;
+  cursor: pointer;
+  background: none;
+  border: none;
+  color: inherit;
+}
+
+input {
+  font-family: inherit;
+  color: inherit;
+}
+
+.sr-only {
+  position: absolute;
+  width: 1px; height: 1px;
+  padding: 0; margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* Visible keyboard focus everywhere */
+a:focus-visible,
+button:focus-visible,
+input:focus-visible {
+  outline: 2px solid var(--color-ember);
+  outline-offset: 3px;
+  border-radius: 4px;
+}
+
+/* ================================================================
+   AMBIENT BACKGROUND (stars / particles / gradient)
+   ================================================================ */
+#bg-canvas {
+  position: fixed;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 0;
+  background:
+    radial-gradient(ellipse 90% 60% at 50% -10%, var(--color-bg-warm) 0%, transparent 60%),
+    radial-gradient(ellipse 80% 60% at 80% 110%, #241b3d 0%, transparent 55%),
+    linear-gradient(180deg, var(--color-bg-deep) 0%, var(--color-bg-mid) 55%, var(--color-bg-deep) 100%);
+  background-size: 200% 200%;
+  animation: bg-drift 26s ease-in-out infinite;
+}
+
+@keyframes bg-drift {
+  0%   { background-position: 50% 0%, 80% 110%, 0% 0%; }
+  50%  { background-position: 45% 10%, 75% 100%, 0% 100%; }
+  100% { background-position: 50% 0%, 80% 110%, 0% 0%; }
+}
+
+/* ================================================================
+   LAYOUT: SCREENS
+   ================================================================ */
+#app {
+  position: relative;
+  z-index: 1;
+}
+
+.screen {
+  position: fixed;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 8vh 6vw;
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+  overflow-y: auto;
+  transition: opacity var(--dur-slow) var(--ease-cinematic);
+}
+
+.screen.is-active {
+  opacity: 1;
+  visibility: visible;
+  pointer-events: auto;
+}
+
+.screen.is-leaving {
+  opacity: 0;
+}
+
+.screen-inner {
+  width: 100%;
+  max-width: var(--content-max);
+  margin: auto;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.9rem;
+}
+
+.screen-inner--wide { max-width: var(--content-max-wide); gap: 1.6rem; }
+.screen-inner--center { justify-content: center; min-height: 40vh; }
+
+/* ================================================================
+   TYPOGRAPHY
+   ================================================================ */
+.line {
+  font-family: var(--font-serif);
+  font-size: clamp(1.3rem, 4.4vw, 1.85rem);
+  font-style: italic;
+  font-weight: 500;
+  color: var(--color-ink-soft);
+  line-height: 1.5;
+  min-height: 1.5em;
+  margin: 0;
+}
+
+.eyebrow-free {
+  font-family: var(--font-serif);
+  font-style: italic;
+  font-size: clamp(1.05rem, 3.4vw, 1.25rem);
+  color: var(--color-ink-faint);
+  margin: 0 0 0.2rem;
+}
+
+.heading-serif {
+  font-family: var(--font-serif);
+  font-weight: 600;
+  font-size: clamp(1.9rem, 6.5vw, 2.6rem);
+  line-height: 1.15;
+  margin: 0 0 1.4rem;
+  color: var(--color-ink);
+}
+
+.heading-serif--small {
+  font-size: clamp(1.4rem, 4.6vw, 1.8rem);
+  margin: 0 0 1.6rem;
+}
+
+.heading-hero {
+  font-family: var(--font-serif);
+  font-weight: 600;
+  font-size: clamp(2.6rem, 10vw, 4.2rem);
+  line-height: 1.05;
+  margin: 0.4rem 0 1.6rem;
+  background: linear-gradient(100deg, var(--color-ink) 30%, var(--color-ember) 60%, var(--color-rose) 90%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+.typewriter-message {
+  font-family: var(--font-serif);
+  font-size: clamp(1.15rem, 3.6vw, 1.4rem);
+  font-style: italic;
+  line-height: 1.65;
+  color: var(--color-ink-soft);
+  max-width: 46ch;
+  margin: 0.4rem auto 3rem;
+  min-height: 3em;
+}
+
+/* Blinking typewriter cursor, appended via JS with this class */
+.type-cursor::after {
+  content: '';
+  display: inline-block;
+  width: 1px;
+  height: 1em;
+  margin-left: 2px;
+  background: currentColor;
+  vertical-align: -0.1em;
+  animation: cursor-blink 0.9s steps(1) infinite;
+}
+
+@keyframes cursor-blink {
+  50% { opacity: 0; }
+}
+
+/* ================================================================
+   BUTTONS
+   ================================================================ */
+.btn {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.55rem;
+  padding: 0.95rem 2.1rem;
+  font-family: var(--font-sans);
+  font-size: 0.98rem;
+  letter-spacing: 0.02em;
+  color: var(--color-bg-deep);
+  background: linear-gradient(120deg, var(--color-ember) 0%, #f0c98a 100%);
+  border-radius: 999px;
+  box-shadow: 0 0 0 rgba(231, 178, 107, 0);
+  transition: transform var(--dur-fast) var(--ease-cinematic),
+              box-shadow var(--dur-fast) var(--ease-cinematic);
+  min-height: 48px;
+}
+
+.btn:hover { transform: translateY(-2px); }
+.btn:active { transform: translateY(0); }
+
+.btn--glow {
+  box-shadow: 0 0 22px 2px var(--color-ember-soft);
+}
+
+.btn--glow:hover {
+  box-shadow: 0 0 32px 6px var(--color-ember-soft);
+}
+
+.btn__spark {
+  width: 13px;
+  height: 13px;
+  opacity: 0.85;
+}
+
+.btn[disabled] {
+  opacity: 0.5;
+  pointer-events: none;
+}
+
+.is-hidden {
+  opacity: 0 !important;
+  transform: translateY(8px);
+  pointer-events: none !important;
+}
+
+.btn.is-hidden { transition: opacity var(--dur-med) var(--ease-cinematic), transform var(--dur-med) var(--ease-cinematic); }
+.btn:not(.is-hidden) { opacity: 1; transform: translateY(0); }
+
+/* ================================================================
+   BIRTHDAY VERIFICATION FORM
+   ================================================================ */
+.birthday-form {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1.6rem;
+  width: 100%;
+}
+
+.date-fields {
+  display: flex;
+  align-items: flex-end;
+  gap: 0.5rem;
+  justify-content: center;
+}
+
+.date-field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  width: 4.4rem;
+}
+
+.date-field--year { width: 6rem; }
+
+.date-field label {
+  font-size: 0.7rem;
+  letter-spacing: 0.08em;
+  color: var(--color-ink-faint);
+}
+
+.date-field input {
+  width: 100%;
+  padding: 0.75rem 0.6rem;
+  text-align: center;
+  font-size: 1.1rem;
+  background: var(--color-glass);
+  border: 1px solid var(--color-glass-border);
+  border-radius: var(--radius-sm);
+  -moz-appearance: textfield;
+}
+
+.date-field input::-webkit-outer-spin-button,
+.date-field input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+.date-field input::placeholder {
+  color: var(--color-ink-faint);
+}
+
+.date-sep {
+  color: var(--color-ink-faint);
+  font-size: 1.3rem;
+  padding-bottom: 0.75rem;
+}
+
+.date-fields.is-shaking {
+  animation: shake 420ms var(--ease-cinematic);
+}
+
+@keyframes shake {
+  10%, 90% { transform: translateX(-2px); }
+  20%, 80% { transform: translateX(4px); }
+  30%, 50%, 70% { transform: translateX(-7px); }
+  40%, 60% { transform: translateX(7px); }
+}
+
+.verify-message {
+  min-height: 1.4em;
+  font-family: var(--font-serif);
+  font-style: italic;
+  font-size: 1rem;
+  color: var(--color-rose);
+  margin: 0;
+  opacity: 0;
+  transition: opacity var(--dur-fast) ease;
+}
+
+.verify-message.is-visible { opacity: 1; }
+.verify-message.is-success { color: var(--color-ember); }
+
+/* ================================================================
+   UNLOCK TRANSITION
+   ================================================================ */
+.unlock-dots {
+  font-family: var(--font-serif);
+  font-size: 1.6rem;
+  color: var(--color-ember);
+  letter-spacing: 0.3em;
+  min-height: 1.6em;
+}
+
+/* ================================================================
+   HERO PHOTO
+   ================================================================ */
+.photo-frame {
+  margin: 0 0 2.2rem;
+  width: 100%;
+  max-width: 380px;
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  border: 1px solid var(--color-glass-border);
+  box-shadow: 0 18px 60px -18px rgba(0, 0, 0, 0.65), 0 0 40px -10px var(--color-ember-soft);
+  opacity: 0;
+  transform: scale(0.96);
+  transition: opacity var(--dur-slow) var(--ease-cinematic),
+              transform var(--dur-slow) var(--ease-cinematic);
+}
+
+.photo-frame.is-visible {
+  opacity: 1;
+  transform: scale(1);
+}
+
+.photo-frame img {
+  width: 100%;
+  height: auto;
+  aspect-ratio: 4 / 5;
+  object-fit: cover;
+  animation: hero-pan 14s ease-in-out infinite alternate;
+}
+
+@keyframes hero-pan {
+  0%   { transform: scale(1) translate(0, 0); }
+  100% { transform: scale(1.08) translate(-1.5%, -1.5%); }
+}
+
+/* Broken-image fallback: quietly collapse rather than show an icon */
+.photo-frame img.is-broken {
+  display: none;
+}
+
+.photo-frame.is-broken {
+  display: none;
+}
+
+/* ================================================================
+   GALLERY
+   ================================================================ */
+.gallery {
+  width: 100%;
+  margin: 1rem 0 3.5rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  opacity: 0;
+  transform: translateY(14px);
+  transition: opacity var(--dur-slow) var(--ease-cinematic),
+              transform var(--dur-slow) var(--ease-cinematic);
+}
+
+.gallery.is-visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.gallery-stage {
+  position: relative;
+  width: 100%;
+  max-width: 340px;
+  aspect-ratio: 4 / 5;
+  overflow: hidden;
+  border-radius: var(--radius-lg);
+}
+
+.gallery-card {
+  position: absolute;
+  inset: 0;
+  margin: 0;
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  border: 1px solid var(--color-glass-border);
+  background: var(--color-glass);
+  box-shadow: 0 18px 60px -18px rgba(0, 0, 0, 0.65);
+  opacity: 1;
+  transform: translateX(0);
+  transition: opacity 620ms var(--ease-cinematic), transform 620ms var(--ease-cinematic);
+}
+
+.gallery-card img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.gallery-card.slide-out-left  { opacity: 0; transform: translateX(-6%); }
+.gallery-card.slide-out-right { opacity: 0; transform: translateX(6%); }
+.gallery-card.slide-in-left   { opacity: 0; transform: translateX(-6%); }
+.gallery-card.slide-in-right  { opacity: 0; transform: translateX(6%); }
+
+.gallery-caption {
+  font-family: var(--font-serif);
+  font-style: italic;
+  font-size: 1.1rem;
+  color: var(--color-ink-soft);
+  margin: 1.3rem 0 0;
+  min-height: 1.6em;
+  text-align: center;
+}
+
+.gallery-controls {
+  display: flex;
+  align-items: center;
+  gap: 1.6rem;
+  margin-top: 1.3rem;
+}
+
+.gallery-btn {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--color-glass);
+  border: 1px solid var(--color-glass-border);
+  color: var(--color-ink);
+  transition: transform var(--dur-fast) var(--ease-cinematic), background var(--dur-fast) ease;
+}
+
+.gallery-btn:hover { background: rgba(255,255,255,0.1); transform: translateY(-1px); }
+.gallery-btn[disabled] { opacity: 0.3; pointer-events: none; }
+
+.gallery-progress {
+  font-family: var(--font-sans);
+  font-size: 0.85rem;
+  letter-spacing: 0.06em;
+  color: var(--color-ink-faint);
+  min-width: 4.5em;
+  text-align: center;
+}
+
+/* ================================================================
+   ONE MORE THING
+   ================================================================ */
+.one-more {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1.6rem;
+  margin: 1rem 0 4rem;
+  opacity: 0;
+  transform: translateY(14px);
+  transition: opacity var(--dur-slow) var(--ease-cinematic),
+              transform var(--dur-slow) var(--ease-cinematic);
+}
+
+.one-more.is-visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* ================================================================
+   FINAL MESSAGE OVERLAY
+   ================================================================ */
+.final-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 5;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 6vh 6vw;
+  background: rgba(8, 6, 15, 0);
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+  transition: opacity var(--dur-slow) var(--ease-cinematic),
+              background var(--dur-slow) var(--ease-cinematic);
+}
+
+.final-overlay.is-visible {
+  opacity: 1;
+  visibility: visible;
+  pointer-events: auto;
+  background: rgba(8, 6, 15, 0.72);
+  backdrop-filter: blur(6px);
+}
+
+.final-card {
+  max-width: 480px;
+  width: 100%;
+  padding: 2.6rem 2rem;
+  text-align: center;
+  background: var(--color-glass);
+  border: 1px solid var(--color-glass-border);
+  border-radius: var(--radius-lg);
+  backdrop-filter: blur(14px);
+  box-shadow: 0 0 0 0 var(--color-ember-soft);
+  transform: scale(0.96);
+  opacity: 0;
+  transition: transform var(--dur-slow) var(--ease-cinematic),
+              opacity var(--dur-slow) var(--ease-cinematic),
+              box-shadow 1.6s ease;
+}
+
+.final-overlay.is-visible .final-card {
+  transform: scale(1);
+  opacity: 1;
+}
+
+.final-card.is-glowing {
+  box-shadow: 0 0 60px 4px var(--color-ember-soft);
+}
+
+.final-message {
+  font-family: var(--font-serif);
+  font-style: italic;
+  font-size: clamp(1.15rem, 4vw, 1.5rem);
+  line-height: 1.75;
+  color: var(--color-ink);
+  white-space: pre-line;
+  min-height: 6em;
+  margin: 0 0 1.6rem;
+}
+
+.final-signature {
+  font-size: 0.85rem;
+  color: var(--color-ink-faint);
+  opacity: 0;
+  transition: opacity var(--dur-slow) ease;
+  margin: 0;
+}
+
+.final-signature.is-visible { opacity: 1; }
+
+/* ================================================================
+   MUSIC TOGGLE
+   ================================================================ */
+.music-toggle {
+  position: fixed;
+  bottom: 1.4rem;
+  right: 1.4rem;
+  z-index: 10;
+  width: 46px;
+  height: 46px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--color-glass);
+  border: 1px solid var(--color-glass-border);
+  backdrop-filter: blur(10px);
+  color: var(--color-ink-faint);
+  transition: color var(--dur-fast) ease, transform var(--dur-fast) ease;
+}
+
+.music-toggle[aria-pressed="true"] {
+  color: var(--color-ember);
+}
+
+.music-toggle:hover { transform: translateY(-1px); }
+
+.music-toggle__icon { font-size: 1.15rem; line-height: 1; }
+
+/* ================================================================
+   FLOATING PARTICLES (spawned by JS, plain divs)
+   ================================================================ */
+.particle {
+  position: fixed;
+  z-index: 2;
+  pointer-events: none;
+  will-change: transform, opacity;
+  opacity: 0;
+}
+
+.particle--dot {
+  border-radius: 50%;
+  background: var(--color-ember);
+  box-shadow: 0 0 6px 1px var(--color-ember-soft);
+}
+
+.particle--heart,
+.particle--star {
+  font-size: 1rem;
+  color: var(--color-rose);
+  filter: drop-shadow(0 0 4px var(--color-ember-soft));
+}
+
+.particle--star { color: var(--color-ember); }
+
+/* ================================================================
+   RESPONSIVE ADJUSTMENTS
+   ================================================================ */
+@media (max-width: 420px) {
+  .screen { padding: 6vh 5vw; }
+  .date-field { width: 3.8rem; }
+  .date-field--year { width: 5.2rem; }
+  .btn { padding: 0.85rem 1.7rem; font-size: 0.92rem; }
+}
+
+@media (min-width: 900px) {
+  .screen-inner--wide { max-width: 760px; }
+  .photo-frame { max-width: 420px; }
+  .gallery-stage { max-width: 380px; }
+}

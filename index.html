@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+<title>For You</title>
+<meta name="description" content="A little something made just for you." />
+
+<!-- Google Fonts: falls back gracefully to system fonts if it fails to load -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,500&family=Jost:wght@300;400;500&display=swap" rel="stylesheet">
+
+<link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+  <!-- Ambient background layer: stars, particles, gradient. Lives behind every screen. -->
+  <canvas id="bg-canvas" aria-hidden="true"></canvas>
+
+  <!-- Live region for quiet status updates (birthday check, etc.) -->
+  <div id="sr-status" class="sr-only" role="status" aria-live="polite"></div>
+
+  <main id="app">
+
+    <!-- ============================================================ -->
+    <!-- SCREEN 1 — MYSTERIOUS WELCOME                                 -->
+    <!-- ============================================================ -->
+    <section id="screen-welcome" class="screen is-active" aria-label="Welcome">
+      <div class="screen-inner">
+        <p class="line line--lead" id="welcome-line1"></p>
+        <p class="line line--lead" id="welcome-line2"></p>
+        <p class="line line--lead" id="welcome-line3"></p>
+        <button type="button" id="btn-begin" class="btn btn--glow is-hidden">
+          <span>Begin</span>
+          <svg class="btn__spark" width="14" height="14" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+            <path d="M12 2 L14 10 L22 12 L14 14 L12 22 L10 14 L2 12 L10 10 Z" fill="currentColor"/>
+          </svg>
+        </button>
+      </div>
+    </section>
+
+    <!-- ============================================================ -->
+    <!-- SCREEN 2 — BIRTHDAY VERIFICATION                               -->
+    <!-- ============================================================ -->
+    <section id="screen-verify" class="screen" aria-label="Enter your birthday">
+      <div class="screen-inner">
+        <p class="eyebrow-free">Before we continue&hellip;</p>
+        <h1 class="heading-serif">Enter your birthday Date</h1>
+
+        <form id="birthday-form" class="birthday-form" novalidate>
+          <div class="date-fields" role="group" aria-labelledby="date-fields-label">
+            <span id="date-fields-label" class="sr-only">Your birthday, day, month and year</span>
+
+            <div class="date-field">
+              <label for="input-day">Day</label>
+              <input type="number" id="input-day" name="day" inputmode="numeric" placeholder="DD" min="1" max="31" autocomplete="off" required />
+            </div>
+            <span class="date-sep" aria-hidden="true">/</span>
+            <div class="date-field">
+              <label for="input-month">Month</label>
+              <input type="number" id="input-month" name="month" inputmode="numeric" placeholder="MM" min="1" max="12" autocomplete="off" required />
+            </div>
+            <span class="date-sep" aria-hidden="true">/</span>
+            <div class="date-field date-field--year">
+              <label for="input-year">Year</label>
+              <input type="number" id="input-year" name="year" inputmode="numeric" placeholder="YYYY" min="1900" max="2100" autocomplete="off" required />
+            </div>
+          </div>
+
+          <p id="verify-message" class="verify-message" aria-live="polite"></p>
+
+          <button type="submit" id="btn-unlock" class="btn btn--glow">
+            <span id="btn-unlock-label">Unlock</span>
+            <svg class="btn__spark" width="14" height="14" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+              <path d="M12 2 L14 10 L22 12 L14 14 L12 22 L10 14 L2 12 L10 10 Z" fill="currentColor"/>
+            </svg>
+          </button>
+        </form>
+      </div>
+    </section>
+
+    <!-- ============================================================ -->
+    <!-- SCREEN — UNLOCK / CINEMATIC TRANSITION                        -->
+    <!-- ============================================================ -->
+    <section id="screen-unlock" class="screen" aria-label="Unlocking">
+      <div class="screen-inner screen-inner--center">
+        <p class="line line--lead" id="unlock-line1"></p>
+        <p class="unlock-dots" id="unlock-dots" aria-hidden="true"></p>
+      </div>
+    </section>
+
+    <!-- ============================================================ -->
+    <!-- SCREEN 3 — MAIN BIRTHDAY REVEAL                                -->
+    <!-- ============================================================ -->
+    <section id="screen-main" class="screen" aria-label="Happy birthday">
+      <div class="screen-inner screen-inner--wide">
+
+        <p class="line line--lead" id="main-line1"></p>
+        <p class="line line--lead" id="main-line2"></p>
+
+        <h1 class="heading-hero">Happy Birthday</h1>
+
+        <figure class="photo-frame photo-frame--hero">
+          <img id="hero-photo" src="images/photo1.jpg" alt="A favorite photo of you" />
+        </figure>
+
+        <p class="typewriter-message" id="hero-message"
+           data-full-text="Some people have a way of making ordinary moments feel a little more special just by being themselves."></p>
+
+        <!-- ============================================================ -->
+        <!-- PHOTO MEMORY GALLERY                                          -->
+        <!-- ============================================================ -->
+        <div class="gallery" id="gallery">
+          <h2 class="heading-serif heading-serif--small">A few of my favorites</h2>
+
+          <div class="gallery-stage">
+            <figure class="gallery-card" id="gallery-card">
+              <img id="gallery-photo" src="images/photo1.jpg" alt="" />
+            </figure>
+          </div>
+
+          <p class="gallery-caption" id="gallery-caption"></p>
+
+          <div class="gallery-controls">
+            <button type="button" id="gallery-prev" class="gallery-btn" aria-label="Previous photo">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M15 5 L8 12 L15 19" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </button>
+            <span class="gallery-progress" id="gallery-progress" aria-live="polite">01 / 04</span>
+            <button type="button" id="gallery-next" class="gallery-btn" aria-label="Next photo">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M9 5 L16 12 L9 19" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </button>
+          </div>
+        </div>
+
+        <!-- ============================================================ -->
+        <!-- ONE MORE THING                                                -->
+        <!-- ============================================================ -->
+        <div class="one-more" id="one-more">
+          <p class="line line--lead">One more thing&hellip;</p>
+          <button type="button" id="btn-open-final" class="btn btn--glow">
+            <span>Open it</span>
+            <svg class="btn__spark" width="14" height="14" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+              <path d="M12 2 L14 10 L22 12 L14 14 L12 22 L10 14 L2 12 L10 10 Z" fill="currentColor"/>
+            </svg>
+          </button>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- ============================================================ -->
+    <!-- FINAL MESSAGE OVERLAY                                          -->
+    <!-- ============================================================ -->
+    <div id="final-overlay" class="final-overlay" aria-hidden="true">
+      <div class="final-card" id="final-card">
+        <p class="final-message" id="final-message"></p>
+        <p class="final-signature" id="final-signature">&mdash; From someone who wanted to make your day a little more special.</p>
+      </div>
+    </div>
+
+  </main>
+
+  <!-- ============================================================ -->
+  <!-- MUSIC CONTROL                                                  -->
+  <!-- ============================================================ -->
+  <button type="button" id="music-toggle" class="music-toggle" aria-label="Play background music" aria-pressed="false">
+    <span class="music-toggle__icon" aria-hidden="true">&#9835;</span>
+  </button>
+  <audio id="bg-audio" src="audio/birthday-music.mp3" loop preload="none"></audio>
+
+  <script src="script.js"></script>
+</body>
+</html>
